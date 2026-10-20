@@ -2,7 +2,7 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
 // Runs on every request: refreshes the Supabase session cookie and
-// protects /app (logged-out users are sent to /login).
+// protects /app and everything under it (logged-out users are sent to /login).
 export async function proxy(request: NextRequest) {
   let response = NextResponse.next({ request });
 
@@ -33,7 +33,9 @@ export async function proxy(request: NextRequest) {
 
   const path = request.nextUrl.pathname;
 
-  if (!user && (path === "/app" || path.startsWith("/app/"))) {
+  const isProtected = path === "/app" || path.startsWith("/app/");
+
+  if (!user && isProtected) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     return NextResponse.redirect(url);

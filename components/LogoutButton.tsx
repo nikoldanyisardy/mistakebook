@@ -19,7 +19,7 @@ export default function LogoutButton() {
     <button
       type="button"
       data-testid="logout"
-      className="btn btn-secondary"
+      className="btn btn-ghost btn-small"
       onClick={handleLogout}
       disabled={loading}
     >
