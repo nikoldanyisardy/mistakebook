@@ -1,17 +1,16 @@
 import { redirect } from "next/navigation";
 import ProfileView from "@/components/ProfileView";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getUser } from "@/lib/supabase/server";
 import type { Course } from "@/lib/mistakes";
 
 export const metadata = { title: "Profile · MistakeBook" };
 
 export default async function ProfilePage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getUser();
 
   if (!user) redirect("/login");
+
+  const supabase = await createClient();
 
   const [coursesRes, mistakesRes] = await Promise.all([
     supabase.from("courses").select("*").order("name"),

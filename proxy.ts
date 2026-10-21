@@ -27,9 +27,13 @@ export async function proxy(request: NextRequest) {
     }
   );
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  // getClaims() verifies the session token's signature against the project's
+  // public signing keys (cached after the first fetch), so it needs no call to
+  // the Auth server on each request. It still rejects missing, forged or
+  // expired tokens and refreshes the session cookie. Every /app page then
+  // checks the user again with the Auth server (getUser in lib/supabase/server).
+  const { data } = await supabase.auth.getClaims();
+  const user = data?.claims?.sub ?? null;
 
   const path = request.nextUrl.pathname;
 

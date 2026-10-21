@@ -1,29 +1,22 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { createClient } from "@/lib/supabase/client";
 
+// Posts to /auth/logout, which signs out and redirects to "/" in one round
+// trip. The label changes the moment the button is pressed.
 export default function LogoutButton() {
-  const router = useRouter();
   const [loading, setLoading] = useState(false);
 
-  async function handleLogout() {
-    setLoading(true);
-    await createClient().auth.signOut();
-    router.push("/");
-    router.refresh();
-  }
-
   return (
-    <button
-      type="button"
-      data-testid="logout"
-      className="btn btn-ghost btn-small"
-      onClick={handleLogout}
-      disabled={loading}
-    >
-      {loading ? "Logging out…" : "Log out"}
-    </button>
+    <form action="/auth/logout" method="post" onSubmit={() => setLoading(true)}>
+      <button
+        type="submit"
+        data-testid="logout"
+        className="btn btn-ghost btn-small"
+        aria-disabled={loading}
+      >
+        {loading ? "Logging out…" : "Log out"}
+      </button>
+    </form>
   );
 }

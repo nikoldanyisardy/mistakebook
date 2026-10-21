@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/server";
+import { getUser } from "@/lib/supabase/server";
 
 const SUBHEADLINE =
   "For business students: save every question you get wrong on quizzes, problem sets and exams, sort them by course, and practice them until they stick.";
@@ -20,10 +20,7 @@ const STEPS = [
 ];
 
 export default async function Home() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getUser();
 
   return (
     <main className="landing">

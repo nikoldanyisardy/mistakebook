@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import MistakesView from "@/components/MistakesView";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getUser } from "@/lib/supabase/server";
 import type { Course, Mistake } from "@/lib/mistakes";
 
 export const metadata = { title: "My mistakes · MistakeBook" };
@@ -10,13 +10,12 @@ export default async function AppPage({
 }: {
   searchParams: Promise<{ saved?: string }>;
 }) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getUser();
 
   // Second check besides the proxy: never render /app for logged-out users.
   if (!user) redirect("/login");
+
+  const supabase = await createClient();
 
   // RLS limits both queries to the user's own rows.
   const [mistakesRes, coursesRes] = await Promise.all([

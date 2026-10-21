@@ -16,6 +16,11 @@ function isActive(pathname: string, href: string) {
     : pathname === href || pathname.startsWith(`${href}/`);
 }
 
+// <Link> prefetches these routes as soon as the nav is on screen (production
+// builds). With loading.tsx in each route, the prefetch includes the loading
+// skeleton, so a tap switches pages instantly while the data loads. Full-data
+// prefetching is left off on purpose: it would query the database for every
+// page on every visit and could show a stale list right after a change.
 export default function NavLinks() {
   const pathname = usePathname();
 

@@ -1255,6 +1255,46 @@ select {
   font-weight: 900;
 }
 
+/* ---------- Loading skeletons ---------- */
+.skeleton {
+  display: block;
+  max-width: 100%;
+  border-radius: 10px;
+  background: var(--surface-soft);
+  animation: skeleton-pulse 1.4s ease-in-out infinite;
+}
+
+.skeleton-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.skeleton-form {
+  gap: 20px;
+}
+
+.skeleton-row {
+  display: flex;
+  gap: 10px;
+}
+
+.skeleton-row .skeleton {
+  flex: 0 1 auto;
+}
+
+@keyframes skeleton-pulse {
+  50% {
+    opacity: 0.55;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton {
+    animation: none;
+  }
+}
+
 /* ---------- Landing ---------- */
 .landing-hero {
   max-width: 1120px;

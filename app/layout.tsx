@@ -4,7 +4,7 @@ import Link from "next/link";
 import HeaderAuthLinks from "@/components/HeaderAuthLinks";
 import LogoutButton from "@/components/LogoutButton";
 import NavLinks, { ProfileLink } from "@/components/NavLinks";
-import { createClient } from "@/lib/supabase/server";
+import { getUser } from "@/lib/supabase/server";
 import "./globals.css";
 
 const nunito = Nunito({
@@ -31,10 +31,7 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getUser();
 
   return (
     <html lang="en" className={nunito.variable}>
