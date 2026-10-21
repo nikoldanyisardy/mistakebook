@@ -1,6 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { cache } from "react";
+import { decodeUser, USER_HEADER } from "@/lib/supabase/auth-shared";
 
 // Server client for Server Components, Server Actions and Route Handlers.
 export async function createClient() {
@@ -29,13 +30,9 @@ export async function createClient() {
   );
 }
 
-// The logged-in user, checked with the Supabase Auth server. Wrapped in
-// React's cache() so the layout and the page share one check per request
-// instead of each making its own network call.
+// The logged-in user for this request, as verified by the proxy with the
+// Supabase Auth server (see proxy.ts). The layout and every page read the same
+// value, so the header and the page can't disagree. No header means logged out.
 export const getUser = cache(async () => {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  return user;
+  return decodeUser((await headers()).get(USER_HEADER));
 });

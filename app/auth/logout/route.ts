@@ -1,8 +1,9 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { isAuthCookie } from "@/lib/supabase/auth-shared";
 
-// Logout in one round trip: sign out on the server, clear the session cookies
-// on this response and send the browser to the landing page.
+// Logout in one round trip: sign out on the server, clear every Supabase
+// session cookie on this response and send the browser to the landing page.
 export async function POST(request: NextRequest) {
   const response = NextResponse.redirect(new URL("/", request.url), 303);
 
@@ -14,26 +15,22 @@ export async function POST(request: NextRequest) {
         getAll() {
           return request.cookies.getAll();
         },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) =>
-            response.cookies.set(name, value, options)
-          );
+        setAll() {
+          // Ignored: the cookies are cleared explicitly below.
         },
       },
     }
   );
+  await supabase.auth.signOut();
 
-  const { error } = await supabase.auth.signOut();
-
-  // If the Auth server couldn't be reached, still remove the session cookies
-  // so the browser is logged out.
-  if (error) {
-    for (const { name } of request.cookies.getAll()) {
-      if (name.startsWith("sb-") && name.includes("-auth-token")) {
-        response.cookies.set(name, "", { path: "/", maxAge: 0 });
-      }
+  // Always clear every auth cookie (including chunks), whether or not the
+  // Auth server was reachable. Same path ("/") and SameSite as when they were
+  // set, so every browser, Safari included, replaces and drops them.
+  for (const { name } of request.cookies.getAll()) {
+    if (isAuthCookie(name)) {
+      response.cookies.set(name, "", { path: "/", maxAge: 0, expires: new Date(0), sameSite: "lax" });
     }
   }
-
+  response.headers.set("Cache-Control", "private, no-store");
   return response;
 }
