@@ -12,7 +12,7 @@ export default function MistakeTags({
 }) {
   const tags = [
     courseName !== OTHER && (
-      <span key="course" className="tag">
+      <span key="course" className="tag tag-course">
         {courseName}
       </span>
     ),
@@ -22,17 +22,17 @@ export default function MistakeTags({
       </span>
     ),
     showMcq && m.is_mcq && (
-      <span key="mcq" className="tag">
+      <span key="mcq" className="tag tag-mcq">
         Multiple choice
       </span>
     ),
     m.mastered && (
-      <span key="mastered" className="tag tag-progress">
+      <span key="mastered" className="tag tag-mastered">
         Mastered
       </span>
     ),
     !m.mastered && m.streak > 0 && (
-      <span key="streak" className="tag tag-progress">
+      <span key="streak" className="tag tag-streak">
         Got it {m.streak}/{MASTERED_AT_STREAK}
       </span>
     ),

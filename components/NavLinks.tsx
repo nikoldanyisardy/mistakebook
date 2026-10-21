@@ -45,7 +45,7 @@ export function ProfileLink() {
   return (
     <Link
       href="/app/profile"
-      className={active ? "btn btn-ghost btn-small active" : "btn btn-ghost btn-small"}
+      className={active ? "header-link active" : "header-link"}
       aria-current={active ? "page" : undefined}
     >
       Profile

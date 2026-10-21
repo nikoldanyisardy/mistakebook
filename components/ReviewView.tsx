@@ -233,10 +233,14 @@ export default function ReviewView({
                     </span>
                     <span>{opt}</span>
                     {picked !== null && isCorrect && (
-                      <span className="mcq-result">Correct</span>
+                      <span className="mcq-result">
+                        <CheckIcon /> Correct
+                      </span>
                     )}
                     {picked === i && !isCorrect && (
-                      <span className="mcq-result">Your pick</span>
+                      <span className="mcq-result">
+                        <XIcon /> Your pick
+                      </span>
                     )}
                   </button>
                 </li>
@@ -358,7 +362,7 @@ function Picker({
                   disabled={!canStart}
                 >
                   <span className="course-card-name">{label}</span>
-                  <span className="course-card-status">
+                  <span className={total === 0 ? "course-card-status is-empty" : "course-card-status"}>
                     {total === 0
                       ? "No mistakes yet"
                       : left === 0
@@ -378,5 +382,21 @@ function Picker({
         </ul>
       )}
     </main>
+  );
+}
+
+function CheckIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="m5 12.5 4.5 4.5L19 7.5" />
+    </svg>
+  );
+}
+
+function XIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" aria-hidden="true">
+      <path d="M6 6l12 12M18 6 6 18" />
+    </svg>
   );
 }

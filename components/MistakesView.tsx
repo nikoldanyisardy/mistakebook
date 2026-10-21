@@ -155,7 +155,7 @@ export default function MistakesView({
           {m.mastered && (
             <button
               type="button"
-              className="btn btn-secondary btn-small"
+              className="btn btn-success-outline btn-small"
               onClick={() => handleReviewAgain(m)}
             >
               Review again
@@ -305,7 +305,7 @@ function EmptyState() {
         <span className="example-label">Example</span>
         <p className="mistake-what">What is the present value of the terminal value in year 5?</p>
         <div className="tags">
-          <span className="tag">Corporate Finance</span>
+          <span className="tag tag-course">Corporate Finance</span>
           <span className="tag tag-type">Forgot formula</span>
         </div>
         <div className="correct-way">

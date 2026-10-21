@@ -27,55 +27,107 @@ export default async function Home() {
 
   return (
     <main className="landing">
-      <section className="container landing-hero">
-        <h1>Your mistakes, mastered.</h1>
-        <p className="landing-sub">{SUBHEADLINE}</p>
-        {user ? (
-          <Link href="/app" className="btn btn-primary btn-large">
-            Go to my mistakes
-          </Link>
-        ) : (
-          <Link href="/signup" className="btn btn-primary btn-large">
-            Sign up free
-          </Link>
-        )}
+      <section className="landing-hero">
+        <div className="landing-hero-text">
+          <h1>Your mistakes, mastered.</h1>
+          <p className="landing-sub">{SUBHEADLINE}</p>
+          {user ? (
+            <Link href="/app" className="btn btn-primary btn-large">
+              Go to my mistakes
+            </Link>
+          ) : (
+            <Link href="/signup" className="btn btn-primary btn-large">
+              Sign up free
+            </Link>
+          )}
+        </div>
+        <HeroIllustration />
       </section>
 
-      <section className="container landing-how" aria-labelledby="how-heading">
-        <h2 id="how-heading">Miss it once. Master it for good.</h2>
+      <section className="landing-how" aria-labelledby="how-heading">
+        <div className="landing-how-inner">
+          <h2 id="how-heading">Miss it once. Master it for good.</h2>
 
-        <ol className="steps">
-          {STEPS.map((step, i) => (
-            <li key={step.title} className="step">
-              <span className="step-number" aria-hidden="true">
-                {i + 1}
-              </span>
-              <div>
-                <h3>{step.title}</h3>
-                <p>{step.text}</p>
+          <ol className="steps">
+            {STEPS.map((step, i) => (
+              <li key={step.title} className="step">
+                <span className="step-number" aria-hidden="true">
+                  {i + 1}
+                </span>
+                <div>
+                  <h3>{step.title}</h3>
+                  <p>{step.text}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
+
+          {/* Static preview of a mistake card; not interactive. */}
+          <figure className="landing-example">
+            <figcaption className="example-label">Example</figcaption>
+            <div className="card mistake">
+              <p className="mistake-what">
+                What is the present value of a terminal value in year 5?
+              </p>
+              <div className="tags">
+                <span className="tag tag-course">Corporate Finance</span>
+                <span className="tag tag-type">Forgot formula</span>
               </div>
-            </li>
-          ))}
-        </ol>
-
-        {/* Static preview of a mistake card; not interactive. */}
-        <figure className="landing-example">
-          <figcaption className="example-label">Example</figcaption>
-          <div className="card mistake">
-            <p className="mistake-what">
-              What is the present value of a terminal value in year 5?
-            </p>
-            <div className="tags">
-              <span className="tag">Corporate Finance</span>
-              <span className="tag tag-type">Forgot formula</span>
+              <div className="correct-way">
+                <span className="correct-label">Correct answer</span>
+                <p>TV / (1 + r)^5</p>
+              </div>
             </div>
-            <div className="correct-way">
-              <span className="correct-label">Correct answer</span>
-              <p>TV / (1 + r)^5</p>
-            </div>
-          </div>
-        </figure>
+          </figure>
+        </div>
       </section>
     </main>
+  );
+}
+
+// Decorative sample review card. Hidden from screen readers; nothing is clickable.
+function HeroIllustration() {
+  const options = [
+    { letter: "A", text: "FIFO" },
+    { letter: "B", text: "LIFO", correct: true },
+    { letter: "C", text: "Weighted average" },
+  ];
+
+  return (
+    <div className="hero-art" aria-hidden="true">
+      <div className="hero-card">
+        <p className="hero-card-label">Review · Financial Accounting</p>
+        <p className="hero-card-question">
+          Which inventory method is not permitted under IFRS?
+        </p>
+        <div className="hero-options">
+          {options.map((o) => (
+            <div
+              key={o.letter}
+              className={o.correct ? "hero-option is-correct" : "hero-option"}
+            >
+              <span className="mcq-letter">{o.letter}</span>
+              <span>{o.text}</span>
+              {o.correct && (
+                <span className="mcq-result">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="m5 12.5 4.5 4.5L19 7.5" />
+                  </svg>
+                  Correct
+                </span>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+      <div className="hero-pill">
+        <span className="hero-pill-check">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="m5 12.5 4.5 4.5L19 7.5" />
+          </svg>
+        </span>
+        Mastered: 2 in a row
+      </div>
+    </div>
   );
 }
