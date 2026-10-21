@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type FormEvent } from "react";
+import { flushSync } from "react-dom";
 import { createClient } from "@/lib/supabase/client";
 import {
   courseNameError,
@@ -31,6 +32,7 @@ export default function ProfileView({
   const [error, setError] = useState<string | null>(loadError);
   const [notice, setNotice] = useState<string | null>(null);
   const dialogRef = useRef<HTMLDialogElement>(null);
+  const renameRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const dialog = dialogRef.current;
@@ -68,10 +70,14 @@ export default function ProfileView({
     setNotice(`Added "${(data as Course).name}".`);
   }
 
+  // Focus inside the tap itself so phones open the keyboard reliably.
   function startRename(c: Course) {
-    reset();
-    setRenamingId(c.id);
-    setRenameText(c.name);
+    flushSync(() => {
+      reset();
+      setRenamingId(c.id);
+      setRenameText(c.name);
+    });
+    renameRef.current?.focus();
   }
 
   async function handleRename(e: FormEvent<HTMLFormElement>, c: Course) {
@@ -201,12 +207,12 @@ export default function ProfileView({
                       New name for {c.name}
                     </label>
                     <input
+                      ref={renameRef}
                       id={`rename-${c.id}`}
                       type="text"
                       maxLength={MAX_COURSE_NAME}
                       value={renameText}
                       onChange={(e) => setRenameText(e.target.value)}
-                      autoFocus
                     />
                     <button type="submit" className="btn btn-primary btn-small" disabled={busy}>
                       Save

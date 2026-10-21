@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState, type FormEvent } from "react";
+import { useRef, useState, type FormEvent } from "react";
+import { flushSync } from "react-dom";
 import { createClient } from "@/lib/supabase/client";
 import {
   courseNameError,
@@ -21,7 +22,6 @@ import {
 } from "@/lib/mistakes";
 
 const OTHER_COURSE = "";
-const ADD_COURSE = "__add__";
 const CUSTOM_TYPE = "__custom__";
 
 type Props = {
@@ -43,7 +43,9 @@ export default function MistakeForm({ initialCourses, customTypes, editing }: Pr
   const [courses, setCourses] = useState(initialCourses);
   const [question, setQuestion] = useState(editing?.question ?? "");
   const [courseId, setCourseId] = useState(editing?.course_id ?? OTHER_COURSE);
+  const [addingCourse, setAddingCourse] = useState(false);
   const [newCourse, setNewCourse] = useState("");
+  const newCourseRef = useRef<HTMLInputElement>(null);
   const [courseError, setCourseError] = useState<string | null>(null);
   const [savingCourse, setSavingCourse] = useState(false);
   const [typeChoice, setTypeChoice] = useState(initialTypeChoice(editing, allTypes));
@@ -63,8 +65,6 @@ export default function MistakeForm({ initialCourses, customTypes, editing }: Pr
   const [explanation, setExplanation] = useState(editing?.explanation ?? "");
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
-
-  const addingCourse = courseId === ADD_COURSE;
 
   async function handleAddCourse() {
     const problem = courseNameError(newCourse, courses);
@@ -88,10 +88,23 @@ export default function MistakeForm({ initialCourses, customTypes, editing }: Pr
     setCourses((prev) => sortCourses([...prev, created]));
     setCourseId(created.id);
     setNewCourse("");
+    setAddingCourse(false);
+  }
+
+  // Runs inside the tap: render the field and focus it in the same event, so
+  // iOS Safari and Android Chrome treat the focus as user-initiated and open
+  // the keyboard. A focus that happens later (after a re-render) can be
+  // ignored or undone by the browser.
+  function openAddCourse() {
+    flushSync(() => {
+      setAddingCourse(true);
+      setCourseError(null);
+    });
+    newCourseRef.current?.focus();
   }
 
   function cancelAddCourse() {
-    setCourseId(OTHER_COURSE);
+    setAddingCourse(false);
     setNewCourse("");
     setCourseError(null);
   }
@@ -117,7 +130,7 @@ export default function MistakeForm({ initialCourses, customTypes, editing }: Pr
 
   function validate() {
     if (!question.trim()) return "Please enter the question or topic.";
-    if (addingCourse) return "Save the new course first, or pick another one.";
+    if (addingCourse && newCourse.trim()) return "Add the new course first, or cancel it.";
     if (!typeChoice) return "Please choose a type.";
     if (!resolveType()) return "Please name your type, or pick another one.";
     if (isMcq) {
@@ -184,22 +197,21 @@ export default function MistakeForm({ initialCourses, customTypes, editing }: Pr
 
       <div className="field">
         <label htmlFor="course">Course</label>
-        <select
-          id="course"
-          value={courseId}
-          onChange={(e) => {
-            setCourseId(e.target.value);
-            setCourseError(null);
-          }}
-        >
-          <option value={OTHER_COURSE}>{OTHER}</option>
-          {courses.map((c) => (
-            <option key={c.id} value={c.id}>
-              {c.name}
-            </option>
-          ))}
-          <option value={ADD_COURSE}>+ Add course</option>
-        </select>
+        <div className="select-row">
+          <select id="course" value={courseId} onChange={(e) => setCourseId(e.target.value)}>
+            <option value={OTHER_COURSE}>{OTHER}</option>
+            {courses.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.name}
+              </option>
+            ))}
+          </select>
+          {!addingCourse && (
+            <button type="button" className="btn btn-secondary btn-small" onClick={openAddCourse}>
+              + Add course
+            </button>
+          )}
+        </div>
       </div>
 
       {addingCourse && (
@@ -207,6 +219,7 @@ export default function MistakeForm({ initialCourses, customTypes, editing }: Pr
           <label htmlFor="new-course">New course name</label>
           <div className="inline-row">
             <input
+              ref={newCourseRef}
               id="new-course"
               type="text"
               maxLength={MAX_COURSE_NAME}
@@ -220,7 +233,6 @@ export default function MistakeForm({ initialCourses, customTypes, editing }: Pr
                   handleAddCourse();
                 }
               }}
-              autoFocus
             />
             <button
               type="button"
@@ -268,7 +280,6 @@ export default function MistakeForm({ initialCourses, customTypes, editing }: Pr
             placeholder="e.g. Units mix-up"
             value={customType}
             onChange={(e) => setCustomType(e.target.value)}
-            autoFocus
           />
         </div>
       )}

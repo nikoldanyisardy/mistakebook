@@ -139,6 +139,8 @@ export default function ReviewView({
   const current = mistakes.find((m) => m.id === session.ids[session.index]);
 
   if (!current) {
+    // Unmastered mistakes still left in this course (or "All courses" / "Other").
+    const remaining = mistakes.filter((m) => !m.mastered && inSelection(m, session.key)).length;
     return (
       <main className="container narrow-md stack">
         <div className="card empty review-done">
@@ -147,13 +149,26 @@ export default function ReviewView({
             You got <strong>{session.right}</strong> right out of{" "}
             <strong>{session.answered}</strong>.
           </p>
-          <p>
-            {session.answered > 0 && session.right === session.answered
-              ? "A perfect round. Well done!"
-              : "Every review makes the next one easier. Keep going!"}
-          </p>
+          {remaining > 0 ? (
+            <>
+              <p>
+                {session.answered > 0 && session.right === session.answered
+                  ? "A perfect round. Well done!"
+                  : "Every review makes the next one easier. Keep going!"}
+              </p>
+              <button
+                type="button"
+                className="btn btn-primary btn-large"
+                onClick={() => start(session.key, session.label)}
+              >
+                Practice again
+              </button>
+            </>
+          ) : (
+            <p className="all-mastered">Everything here is mastered.</p>
+          )}
           <div className="form-actions">
-            <button type="button" className="btn btn-primary" onClick={leave}>
+            <button type="button" className="btn btn-ghost" onClick={leave}>
               Review another course
             </button>
             <Link href="/app" className="btn btn-ghost">
